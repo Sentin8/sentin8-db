@@ -1,0 +1,17 @@
+//! sentin8-db-sdk — per-service SDK mini-facade (SDD §3.1).
+//!
+//! Re-exports the service's client + contracts crates. No logic, no
+//! features (SDD-4b). Consumers import as `use sentin8_db_sdk::{client|contracts}::…`.
+
+#![forbid(unsafe_code)]
+#![warn(missing_docs)]
+
+/// db-client — HTTP client (re-export).
+pub mod client {
+    pub use sentin8_db_client::*;
+}
+
+/// db-contracts — wire types + OpenAPI spec (re-export).
+pub mod contracts {
+    pub use sentin8_db_contracts::*;
+}
