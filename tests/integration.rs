@@ -47,9 +47,7 @@ mod tests {
     async fn db_pool() -> Option<sqlx::PgPool> {
         let url = std::env::var("SENTIN8_DB_DB_DSN")
             .or(std::env::var("DATABASE_URL"))
-            .unwrap_or_else(|_| {
-                "postgres://sentin8_db_service@localhost:5432/sentin8".into()
-            });
+            .unwrap_or_else(|_| "postgres://sentin8_db_service@localhost:5432/sentin8".into());
         match sqlx::postgres::PgPool::connect(&url).await {
             Ok(p) => Some(p),
             Err(e) => {
