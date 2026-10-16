@@ -4,7 +4,11 @@
     {
       "service_type": "sentin8:db",
       "subdomain": "db",
-      "binary": "sentin8-db"
+      "binary": "sentin8-db",
+      "telemetry_property": {
+        "slug": "db",
+        "name": "Sentin8:DB Platform Telemetry"
+      }
     }
   ]
 }
