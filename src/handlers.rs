@@ -61,7 +61,7 @@ type HandlerError = (StatusCode, String);
 /// Query parameter for cross-env operations — allows callers (e.g. BFF) to
 /// target a specific env. Only honored when the caller carries platform-admin
 /// authority (`sentin8:sys:admin`) or targets their own env.
-#[derive(Debug, Deserialize, Default)]
+#[derive(Debug, Deserialize, Default, utoipa::IntoParams, utoipa::ToSchema)]
 /// The targetenvquery type.
 pub struct TargetEnvQuery {
     #[serde(default)]
@@ -943,6 +943,15 @@ async fn write_data_audit(
 // ── Health ──────────────────────────────────────────────────────────────
 
 /// Handle health.
+#[utoipa::path(
+    get,
+    path = "/v1/health",
+    responses(
+        (status = 200, description = "Liveness (version, build, active connections)", body = serde_json::Value),
+    ),
+    security(),
+    tag = "meta",
+)]
 pub async fn health() -> Json<serde_json::Value> {
     let mut payload = serde_json::json!({"status": "ok", "version": sentin8::build_info::id(), "build": sentin8::build_info::build_hash()});
     if let Some(n) = sentin8::middleware::traffic_counter::process_active_connections() {

@@ -32,6 +32,21 @@ const ADMIN_SCOPES: &[&str] = &[
 ];
 
 /// Fetch admin ui.
+#[utoipa::path(
+    get,
+    path = "/v1/admin/ui/{page}",
+    params(
+        ("page" = String, Path, description = "RFW page name"),
+        ("target_env_id" = String, Query, description = "Target env (RLS context)")
+    ),
+    responses(
+        (status = 200, description = "RFW page definition (rendered by Sentin8:Dash)", body = serde_json::Value),
+        (status = 403, description = "Caller lacks a db read/admin scope"),
+        (status = 404, description = "Unknown page"),
+    ),
+    security(("sentin8:db:admin" = [])),
+    tag = "admin-ui",
+)]
 pub async fn get_admin_ui(
     State(state): State<AppState>,
     headers: HeaderMap,
@@ -165,6 +180,21 @@ pub async fn get_admin_ui(
 /// recent DDL audit entries for `audit`. Cross-env via `target_env_id`
 /// requires `sentin8:sys:admin` (handlers::TargetEnvQuery validation applies).
 /// Fetch admin data.
+#[utoipa::path(
+    get,
+    path = "/v1/admin/{resource}",
+    params(
+        ("resource" = String, Path, description = "Admin data resource"),
+        ("target_env_id" = String, Query, description = "Target env (RLS context)")
+    ),
+    responses(
+        (status = 200, description = "The resource's rows for the RFW table", body = serde_json::Value),
+        (status = 403, description = "Caller lacks a db read/admin scope"),
+        (status = 404, description = "Unknown resource"),
+    ),
+    security(("sentin8:db:admin" = [])),
+    tag = "admin-ui",
+)]
 pub async fn get_admin_data(
     State(state): State<AppState>,
     headers: HeaderMap,
@@ -177,6 +207,17 @@ pub async fn get_admin_data(
 /// GET handler for the literal `/v1/admin/tables` route (the POST alias
 /// shares the path; without an explicit GET registration axum answers 405).
 /// Fetch admin data for tables.
+#[utoipa::path(
+    get,
+    path = "/v1/admin/tables",
+    params(("target_env_id" = String, Query, description = "Target env (RLS context)")),
+    responses(
+        (status = 200, description = "The tables rows for the RFW table", body = serde_json::Value),
+        (status = 403, description = "Caller lacks a db read/admin scope"),
+    ),
+    security(("sentin8:db:admin" = [])),
+    tag = "admin-ui",
+)]
 pub async fn get_admin_data_for_tables(
     State(state): State<AppState>,
     headers: HeaderMap,
@@ -295,6 +336,19 @@ async fn admin_data(
 /// `POST /v1/admin/tables` — create-table form submission (RFW renderer
 /// only supports POST). Delegates to the main create handler.
 /// Handle admin create table.
+#[utoipa::path(
+    post,
+    path = "/v1/admin/tables",
+    params(("target_env_id" = String, Query, description = "Target env (RLS context)")),
+    request_body = crate::handlers::CreateTableRequest,
+    responses(
+        (status = 200, description = "Table created", body = serde_json::Value),
+        (status = 400, description = "Invalid create-table form"),
+        (status = 403, description = "Caller lacks a db admin scope"),
+    ),
+    security(("sentin8:db:admin" = [])),
+    tag = "admin-ui",
+)]
 pub async fn admin_create_table(
     State(state): State<AppState>,
     headers: HeaderMap,
@@ -308,6 +362,21 @@ pub async fn admin_create_table(
 
 /// `POST /v1/admin/tables/{id}/archive` — archive row action.
 /// Handle admin archive table.
+#[utoipa::path(
+    post,
+    path = "/v1/admin/tables/{id}/archive",
+    params(
+        ("id" = uuid::Uuid, Path, description = "Table id"),
+        ("target_env_id" = String, Query, description = "Target env (RLS context)")
+    ),
+    responses(
+        (status = 200, description = "Table archived", body = serde_json::Value),
+        (status = 403, description = "Caller lacks a db admin scope"),
+        (status = 404, description = "Unknown table"),
+    ),
+    security(("sentin8:db:admin" = [])),
+    tag = "admin-ui",
+)]
 pub async fn admin_archive_table(
     State(state): State<AppState>,
     headers: HeaderMap,
@@ -321,6 +390,21 @@ pub async fn admin_archive_table(
 
 /// `POST /v1/admin/tables/{id}/drop` — drop row action.
 /// Handle admin drop table.
+#[utoipa::path(
+    post,
+    path = "/v1/admin/tables/{id}/drop",
+    params(
+        ("id" = uuid::Uuid, Path, description = "Table id"),
+        ("target_env_id" = String, Query, description = "Target env (RLS context)")
+    ),
+    responses(
+        (status = 200, description = "Table dropped", body = serde_json::Value),
+        (status = 403, description = "Caller lacks a db admin scope"),
+        (status = 404, description = "Unknown table"),
+    ),
+    security(("sentin8:db:admin" = [])),
+    tag = "admin-ui",
+)]
 pub async fn admin_drop_table(
     State(state): State<AppState>,
     headers: HeaderMap,
