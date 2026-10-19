@@ -52,7 +52,7 @@ impl DbClient {
         format!("{}{}", self.base_url, path)
     }
 
-    /// `POST /v1/data/query` — filtered/sorted/paginated row selection.
+    /// `POST /v1/data/query` - filtered/sorted/paginated row selection.
     pub async fn query(&self, req: &QueryRequest) -> Result<QueryResponse, DbError> {
         let resp = self
             .http
@@ -93,7 +93,7 @@ impl DbClient {
             .map_err(|e| DbError::Decode(e.to_string()))
     }
 
-    /// `POST /v1/data/update` — update rows by filter with an optional
+    /// `POST /v1/data/update` - update rows by filter with an optional
     /// resource-version (optimistic concurrency) check.
     pub async fn update(
         &self,
@@ -124,7 +124,7 @@ impl DbClient {
             .map_err(|e| DbError::Decode(e.to_string()))
     }
 
-    /// `POST /v1/data/delete` — soft-delete rows by filter.
+    /// `POST /v1/data/delete` - soft-delete rows by filter.
     pub async fn delete(
         &self,
         table: &str,
@@ -147,7 +147,7 @@ impl DbClient {
             .map_err(|e| DbError::Decode(e.to_string()))
     }
 
-    /// `POST /v1/tables` — create a table (system columns + RLS applied
+    /// `POST /v1/tables` - create a table (system columns + RLS applied
     /// server-side).
     pub async fn create_table(
         &self,
@@ -176,7 +176,7 @@ impl DbClient {
             .map_err(|e| DbError::Decode(e.to_string()))
     }
 
-    /// `GET /v1/tables` — list tables for the caller's tenant.
+    /// `GET /v1/tables` - list tables for the caller's tenant.
     pub async fn list_tables(&self) -> Result<Vec<serde_json::Value>, DbError> {
         let resp = self
             .http
@@ -193,7 +193,7 @@ impl DbClient {
             .map_err(|e| DbError::Decode(e.to_string()))
     }
 
-    /// `GET /v1/tables/{id}` — get one table's metadata.
+    /// `GET /v1/tables/{id}` - get one table's metadata.
     pub async fn get_table(&self, id: &str) -> Result<serde_json::Value, DbError> {
         let resp = self
             .http
@@ -210,7 +210,7 @@ impl DbClient {
             .map_err(|e| DbError::Decode(e.to_string()))
     }
 
-    /// `POST /v1/tables/{id}/alter` — safe schema alteration (additive
+    /// `POST /v1/tables/{id}/alter` - safe schema alteration (additive
     /// columns only).
     pub async fn alter_table(
         &self,
@@ -234,7 +234,7 @@ impl DbClient {
             .map_err(|e| DbError::Decode(e.to_string()))
     }
 
-    /// `GET /v1/health` — health check.
+    /// `GET /v1/health` - health check.
     pub async fn health(&self) -> Result<serde_json::Value, DbError> {
         let resp = self
             .http
@@ -252,7 +252,7 @@ impl DbClient {
 }
 
 // Pure tests: the client's URL assembly, bearer-token attachment, and
-// error mapping against a local TCP listener acting as the DB service —
+// error mapping against a local TCP listener acting as the DB service -
 // no backing services.
 
 #[cfg(test)]
@@ -261,7 +261,7 @@ mod tests {
     use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
     /// One-shot local HTTP server: reads the request, replies with
-    /// `(status, body)`. Returns `(join_handle_for_raw_request, addr)` —
+    /// `(status, body)`. Returns `(join_handle_for_raw_request, addr)` -
     /// await the handle after the client call to assert on the request.
     async fn serve_once(
         status_line: &'static str,
@@ -384,7 +384,7 @@ mod tests {
             sock.write_all(resp.as_bytes()).await.unwrap();
             req
         });
-        // Double slash would break path matching — trailing slash must be cut.
+        // Double slash would break path matching - trailing slash must be cut.
         let c = DbClient::new(format!("http://{addr}/"), "t");
         c.health().await.unwrap();
         let raw = handle.await.unwrap();

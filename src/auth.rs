@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:DB
 // SPDX-License-Identifier: Apache-2.0
 
-//! Auth token verification — re-exported from the sentin8-auth-client SDK.
+//! Auth token verification - re-exported from the sentin8-auth-client SDK.
 //!
 //! db does not currently use auth in its handlers; this module exists
 //! for future use and to keep the service structure consistent.

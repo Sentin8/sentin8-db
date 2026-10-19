@@ -3,11 +3,11 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:DB
 // SPDX-License-Identifier: Apache-2.0
 
-// Integration tests for DB — Story 1.3.21 + hardening 1.3h.12.
+// Integration tests for DB - Story 1.3.21 + hardening 1.3h.12.
 //
 // Pure-function unit tests run always; DB-backed tests use the runtime-skip
 // pattern (testing-strategy §3.2): attempt to connect, print one skip line
-// and return when PostgreSQL is unreachable — never `#[ignore]`.
+// and return when PostgreSQL is unreachable - never `#[ignore]`.
 //
 // DB-backed coverage: table lifecycle (create → archive → drop), data CRUD
 // with filters/sorts/soft-delete, cross-tenant RLS isolation, RLS drift
@@ -51,7 +51,7 @@ mod tests {
         match sqlx::postgres::PgPool::connect(&url).await {
             Ok(p) => Some(p),
             Err(e) => {
-                eprintln!("skipping DB-backed db tests — PostgreSQL unreachable: {e}");
+                eprintln!("skipping DB-backed db tests - PostgreSQL unreachable: {e}");
                 None
             }
         }
@@ -261,7 +261,7 @@ mod tests {
         assert_eq!(exists, 0, "dropped table must be physically gone");
 
         // Cleanup registry + audit rows for this test env (outbox rows are
-        // producer-insert-only for the service role — the relay owns relayed
+        // producer-insert-only for the service role - the relay owns relayed
         // row lifecycle, and the random test env_id keeps them inert).
         for sql in [
             "DELETE FROM table_registry WHERE env_id = $1",
@@ -314,7 +314,7 @@ mod tests {
         .unwrap();
         tx.commit().await.unwrap();
 
-        // A brand-new transaction with NO context must see zero rows —
+        // A brand-new transaction with NO context must see zero rows -
         // missing RLS context fails closed (design §4).
         let mut tx = pool.begin().await.unwrap();
         let visible = count_rows(

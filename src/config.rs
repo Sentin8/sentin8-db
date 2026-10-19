@@ -22,7 +22,7 @@ pub struct Db8Config {
     /// Auth issuer for token verification.
     /// The sentin8 auth issuer.
     pub sentin8_auth_issuer: String,
-    /// Shared Auth client — constructed once so the discovery and JWKS
+    /// Shared Auth client - constructed once so the discovery and JWKS
     /// caches are reused across every request (5-minute TTL each).
     /// Cloning is cheap (the caches live behind an `Arc`).
     /// The auth client.
@@ -35,10 +35,10 @@ pub struct Db8Config {
     pub stream_family: String,
 }
 
-/// System Organization ID — used as fallback when token has no org claim.
+/// System Organization ID - used as fallback when token has no org claim.
 /// The system org id constant.
 pub const SYSTEM_ORG_ID: uuid::Uuid = uuid::Uuid::from_u128(0x00000000_0000_0000_0000_000000000001);
-/// System Environment ID — used as fallback when token has no env claim.
+/// System Environment ID - used as fallback when token has no env claim.
 /// The system env id constant.
 pub const SYSTEM_ENV_ID: uuid::Uuid = uuid::Uuid::from_u128(0x00000000_0000_0000_0000_000000000002);
 

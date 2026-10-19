@@ -74,7 +74,7 @@ use crate::handlers;
     security(),
     tags(
         (name = "policy", description = "Shield policy administration (shared surface)"),
-        (name = "db", description = "Sentin8:DB admin API — tables, data CRUD, posture, audit"),
+        (name = "db", description = "Sentin8:DB admin API - tables, data CRUD, posture, audit"),
     ),
 )]
 pub struct DbOpenApi;

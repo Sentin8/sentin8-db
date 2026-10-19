@@ -5,7 +5,7 @@
 
 //! # db-contracts
 //!
-//! Rust types for the DB structured-persistence HTTP API — registered
+//! Rust types for the DB structured-persistence HTTP API - registered
 //! tables, schema definitions, and the query/insert/update/delete wire
 //! contract.
 
@@ -94,7 +94,7 @@ pub struct Pagination {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub offset: Option<u32>,
     /// Keyset cursor (DB-3, db README §7): return rows strictly after this
-    /// `id`. Takes precedence over `offset` when set — stable under inserts
+    /// `id`. Takes precedence over `offset` when set - stable under inserts
     /// between pages, unlike the offset window. Paired with `sort` on `id`
     /// enforced server-side when the cursor is used.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -118,7 +118,7 @@ pub struct QueryResponse {
     pub rows: Vec<serde_json::Value>,
     /// Total matching row count (ignoring pagination).
     pub total: u64,
-    /// Keyset cursor (DB-3): the last returned row's `id` — pass it back as
+    /// Keyset cursor (DB-3): the last returned row's `id` - pass it back as
     /// `pagination.after` to fetch the next page. `null` when the page was
     /// the last (fewer rows than `limit` returned).
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -172,7 +172,7 @@ mod tests {
             }],
         };
         let v = serde_json::to_value(&req).unwrap();
-        // skip_serializing_if — absent when None (wire-format stability).
+        // skip_serializing_if - absent when None (wire-format stability).
         assert!(v.get("description").is_none());
         assert_eq!(v["columns"][0]["default"], "0");
         let back: CreateTableRequest = serde_json::from_value(v).unwrap();
@@ -182,7 +182,7 @@ mod tests {
 
     #[test]
     fn query_request_defaults() {
-        // filters/sort/pagination all #[serde(default)] — minimal body works.
+        // filters/sort/pagination all #[serde(default)] - minimal body works.
         let req: QueryRequest = serde_json::from_value(json!({ "table": "t" })).unwrap();
         assert_eq!(req.table, "t");
         assert!(req.filters.is_null());
@@ -212,7 +212,7 @@ mod tests {
         assert!(back.sort[0].descending);
         assert_eq!(back.pagination.limit, Some(50));
         assert_eq!(back.pagination.offset, Some(100));
-        // Filters survive as an opaque JSON value — DB never interprets them.
+        // Filters survive as an opaque JSON value - DB never interprets them.
         assert_eq!(back.filters["balance_gt"], "100.00");
     }
 

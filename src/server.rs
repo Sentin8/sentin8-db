@@ -14,7 +14,7 @@ use crate::handlers;
 /// The shell (sentin8-shell) owns the boot sequence (pool, PG18 check,
 /// TLS listener), the state binding, the OpenAPI merge, and the standard
 /// middleware stack (correlation, host context, TLS context, request
-/// logging, traffic counter, CORS). This function adds ONLY routes —
+/// logging, traffic counter, CORS). This function adds ONLY routes -
 /// including the service's own `/v1/health` (custom payload).
 pub fn routes(
     router: axum::Router<crate::handlers::AppState>,
@@ -24,8 +24,8 @@ pub fn routes(
         // ── Admin UI (RFW) ─────────────────────────────────────────────────
         .route("/v1/admin/ui/{*page}", get(crate::admin_ui::get_admin_ui))
         .route("/v1/admin/{resource}", get(crate::admin_ui::get_admin_data))
-        // ── Sentin8:Policy admin API ( — shared implementation;
-        // the state already carries `SharedAdminState` — the routes were the
+        // ── Sentin8:Policy admin API ( - shared implementation;
+        // the state already carries `SharedAdminState` - the routes were the
         // only missing piece; RFW renderer aliases included).
         .route(
             "/v1/admin/policy-sets",
@@ -90,9 +90,9 @@ pub fn routes(
             "/v1/admin/attributes/{id}/delete",
             post(sentin8::shield::admin::admin_delete_attribute::<handlers::AppState>),
         )
-        // Admin mutation aliases — the RFW renderer only supports POST
+        // Admin mutation aliases - the RFW renderer only supports POST
         // . The page defs also use
-        // "/v1/admin/tables" as the DATA endpoint (GET) — register GET
+        // "/v1/admin/tables" as the DATA endpoint (GET) - register GET
         // explicitly, otherwise the POST-only literal shadows the
         // GET /v1/admin/{resource} catch-all and every read 405s.
         .route(
@@ -114,20 +114,20 @@ pub fn routes(
         )
         .route("/v1/tables/{id}", get(handlers::get_table))
         .route("/v1/tables/{id}/alter", post(handlers::alter_table))
-        // Table lifecycle — Stories
+        // Table lifecycle - Stories
         .route("/v1/tables/{id}/archive", post(handlers::archive_table))
         .route("/v1/tables/{id}/drop", post(handlers::drop_table))
         .route("/v1/data/query", post(handlers::query))
         .route("/v1/data/insert", post(handlers::insert))
         .route("/v1/data/update", post(handlers::update))
         .route("/v1/data/delete", post(handlers::delete))
-        // Operational APIs — Stories
+        // Operational APIs - Stories
         .route("/v1/posture", get(handlers::posture))
         .route("/v1/audit", get(handlers::audit_log))
-    // Traffic counter — counts every inbound request (excludes health checks).
+    // Traffic counter - counts every inbound request (excludes health checks).
 }
 
-/// Shared policy-admin surface accessor — the generic
+/// Shared policy-admin surface accessor - the generic
 /// `sentin8::shield::admin` handlers mounted above extract this service's
 /// admin state via the `HasPolicyAdmin` trait (stat/acme pattern: derive
 /// from the AppState's `admin` field).

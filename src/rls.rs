@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:DB
 // SPDX-License-Identifier: Apache-2.0
 
-//! RLS context setter — sets transaction-local PostgreSQL session variables
+//! RLS context setter - sets transaction-local PostgreSQL session variables
 //! before any query executes.
 //!
 //! ```sql
@@ -42,7 +42,7 @@ pub async fn set_rls_context(
 
 /// Statement timeout tiers (db README §7): interactive request paths get a
 /// 5s cap, batch writes (multi-row insert) get 60s. `SET LOCAL` is
-/// transaction-scoped — the timeout must be set INSIDE the caller's
+/// transaction-scoped - the timeout must be set INSIDE the caller's
 /// transaction (same discipline as the RLS context) and evaporates at
 /// commit, so pooled connections are never left with a stale cap.
 /// Interactive tier statement timeout (db README §7).
@@ -67,7 +67,7 @@ pub async fn set_statement_timeout(
 }
 
 /// Extended RLS context setter (Epics 15.5 / ). Resolves the admin flags
-/// from the caller's scopes (option a — no per-row group-membership join) and
+/// from the caller's scopes (option a - no per-row group-membership join) and
 /// passes the Auth user UUID for holder-scoped RLS. All services that
 /// set tenant context should call this instead of the legacy 6-arg form.
 /// Handle set RLS context ext.

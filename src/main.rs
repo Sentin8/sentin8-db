@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:DB
 // SPDX-License-Identifier: Apache-2.0
 
-//! Sentin8 DB — structured persistence over PostgreSQL with RLS.
+//! Sentin8 DB - structured persistence over PostgreSQL with RLS.
 //!
 //! Boot runs on the platform `sentin8-shell` crate (design
 //! ): registration
@@ -35,7 +35,7 @@ async fn main() -> anyhow::Result<()> {
         sentin8::shell::Sentin8Shell::new("sentin8:db", "SENTIN8_DB")
             .with_registration(registration::print)
             .with_state(|core| async move {
-                // Config is built INSIDE the state closure — after
+                // Config is built INSIDE the state closure - after
                 // `shell::serve` has handled the `--print-registration` flag
                 // (shell step 1). `Db8Config::from_env` constructs an
                 // `AuthClient` (reqwest), which panics without the PQ crypto
@@ -44,10 +44,10 @@ async fn main() -> anyhow::Result<()> {
                 // `--print-registration` (vertical init / enroll) with "No
                 // provider set".
                 let cfg = config::Db8Config::from_env();
-                // ── Sentin8:Policy (— shell-owned boot):
+                // ── Sentin8:Policy (- shell-owned boot):
                 // the engine arrived already booted from the shell (step 8,
                 // in `core.admin.policy`). This state closure only copies
-                // the Arc — no second engine, consumer, or DCR registration.
+                // the Arc - no second engine, consumer, or DCR registration.
                 let policy_engine = core.admin.policy.clone();
                 Ok(handlers::AppState {
                     config: std::sync::Arc::new(cfg.clone()),

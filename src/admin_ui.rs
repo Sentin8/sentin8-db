@@ -3,10 +3,10 @@
 // SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:DB
 // SPDX-License-Identifier: Apache-2.0
 
-//! Sentin8:DB Admin UI handlers — RFW definitions.
+//! Sentin8:DB Admin UI handlers - RFW definitions.
 //! Served from `GET /v1/admin/ui/{page}`, rendered by Sentin8:Dash at runtime.
 //! Mutation forms POST to the `/v1/admin/{resource}` alias routes
-//! ( — RFW renderer only supports POST).
+//! ( - RFW renderer only supports POST).
 //! All data handlers resolve + validate `target_env_id` and run inside a
 //! transaction with the RLS context set on it.
 
@@ -156,7 +156,7 @@ pub async fn get_admin_ui(
         "settings" => AdminPage::new("DB Settings")
             .widget(card("Settings", "Sentin8:DB settings."))
             .build(),
-        // ── Policy Studio — shared page
+        // ── Policy Studio - shared page
         // constructors; the guard guarantees `Some` ( dispatch).
         p if sentin8::rfw::policy_page("sentin8:db", p).is_some() => {
             sentin8::rfw::policy_page("sentin8:db", p)
@@ -175,7 +175,7 @@ pub async fn get_admin_ui(
     ))
 }
 
-/// `GET /v1/admin/{resource}` — returns a JSON array of admin data rows.
+/// `GET /v1/admin/{resource}` - returns a JSON array of admin data rows.
 /// Registry-backed for `tables`, live posture findings for `posture`,
 /// recent DDL audit entries for `audit`. Cross-env via `target_env_id`
 /// requires `sentin8:sys:admin` (handlers::TargetEnvQuery validation applies).
@@ -333,7 +333,7 @@ async fn admin_data(
     Ok(Json(serde_json::Value::Array(rows)))
 }
 
-/// `POST /v1/admin/tables` — create-table form submission (RFW renderer
+/// `POST /v1/admin/tables` - create-table form submission (RFW renderer
 /// only supports POST). Delegates to the main create handler.
 /// Handle admin create table.
 #[utoipa::path(
@@ -360,7 +360,7 @@ pub async fn admin_create_table(
         .map(|Json(resp)| Json(serde_json::json!({"ok": true, "table": resp})))
 }
 
-/// `POST /v1/admin/tables/{id}/archive` — archive row action.
+/// `POST /v1/admin/tables/{id}/archive` - archive row action.
 /// Handle admin archive table.
 #[utoipa::path(
     post,
@@ -388,7 +388,7 @@ pub async fn admin_archive_table(
         .map(|Json(resp)| Json(serde_json::json!({"ok": true, "result": resp})))
 }
 
-/// `POST /v1/admin/tables/{id}/drop` — drop row action.
+/// `POST /v1/admin/tables/{id}/drop` - drop row action.
 /// Handle admin drop table.
 #[utoipa::path(
     post,

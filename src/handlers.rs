@@ -5,7 +5,7 @@
 
 //! HTTP handlers for DB's table-lifecycle and data-CRUD APIs.
 //!
-//! Stories; hardening pass –
+//! Stories; hardening pass -
 //! (`design/sentin8-sentin8-db-technical-design.md` ).
 //!
 //! Every handler that touches tenant data follows the same shape:
@@ -47,10 +47,10 @@ pub struct AppState {
     pub config: Arc<Db8Config>,
     /// The pool.
     pub pool: sqlx::PgPool,
-    /// Shield engine ( — ): additional gate after scope.
+    /// Shield engine ( - ): additional gate after scope.
     /// The policy.
     pub policy: Arc<crate::policy::Engine>,
-    /// Shared Sentin8:Policy admin surface ( — one
+    /// Shared Sentin8:Policy admin surface ( - one
     /// implementation for every service; mounted in server::routes).
     /// The admin.
     pub admin: sentin8::shield::admin::SharedAdminState,
@@ -58,7 +58,7 @@ pub struct AppState {
 
 type HandlerError = (StatusCode, String);
 
-/// Query parameter for cross-env operations — allows callers (e.g. BFF) to
+/// Query parameter for cross-env operations - allows callers (e.g. BFF) to
 /// target a specific env. Only honored when the caller carries platform-admin
 /// authority (`sentin8:sys:admin`) or targets their own env.
 #[derive(Debug, Deserialize, Default, utoipa::IntoParams, utoipa::ToSchema)]
@@ -73,7 +73,7 @@ pub struct TargetEnvQuery {
 /// `x-sentin8-env-id` header, falling back to the token's env. A caller may
 /// name a foreign env only if it is a platform admin (`sentin8:sys:admin`) or holds
 /// an RBAC role/group in the target env (mirrors app's
-/// `require_target_env_access` — design ,
+/// `require_target_env_access` - design ,
 /// rule 5: requests that cannot resolve a valid tenant context are
 /// rejected, never silently retargeted).
 async fn resolve_env_id(
@@ -100,7 +100,7 @@ async fn resolve_env_id(
         return Ok(target);
     }
     // Cross-env callers must hold RBAC membership in the target env (direct
-    // role or group role). — the RBAC tables are RLS'd; set the
+    // role or group role). - the RBAC tables are RLS'd; set the
     // SYSTEM_ENV context on this helper's own transaction ( rule 2).
     let user_id = uuid::Uuid::parse_str(auth.claims.sub.as_str()).unwrap_or(uuid::Uuid::nil());
     let mut tx = pool
@@ -151,7 +151,7 @@ async fn require_env(
 }
 
 /// Public wrapper used by the admin-UI handlers (same validation path as
-/// the main handlers — design ).
+/// the main handlers - design ).
 /// Resolve admin env.
 pub async fn resolve_admin_env(
     pool: &sqlx::PgPool,
@@ -189,13 +189,13 @@ pub struct TableResponse {
     pub status: String,
 }
 
-/// `POST /v1/tables` — create a table with mandatory system columns + RLS.
+/// `POST /v1/tables` - create a table with mandatory system columns + RLS.
 ///
 /// Creates the physical PostgreSQL table with the mandatory system column set
 /// (`id`, `env_id`, `data` JSONB, `created_at`, `updated_at`,
 /// `resource_version`, `deleted_at`), enables + forces RLS, creates the four
 /// env-scoped policies, registers the table in `table_registry`, writes the
-/// `create` DDL audit row, and emits the `sentin8:db:table:created` event —
+/// `create` DDL audit row, and emits the `sentin8:db:table:created` event -
 /// registry, audit, and event all in the SAME transaction as the domain
 /// change.
 #[utoipa::path(
@@ -409,7 +409,7 @@ pub async fn create_table(
     }))
 }
 
-/// `GET /v1/tables` — list active tables for the resolved env.
+/// `GET /v1/tables` - list active tables for the resolved env.
 #[utoipa::path(
     get,
     operation_id = "table.list",
@@ -477,7 +477,7 @@ pub async fn list_tables(
     Ok(Json(tables))
 }
 
-/// `GET /v1/tables/{id}` — get table metadata. Env-scoped + authenticated
+/// `GET /v1/tables/{id}` - get table metadata. Env-scoped + authenticated
 /// ; a foreign-env id 404s.
 #[utoipa::path(
     get,
@@ -552,7 +552,7 @@ pub async fn get_table(
 /// Resolve a logical table name to its physical PostgreSQL table via
 /// `table_registry`. Must run inside a transaction that already has the
 /// RLS context set; the physical name is the only name that exists in the
-/// database — data handlers never query the bare logical name.
+/// database - data handlers never query the bare logical name.
 async fn resolve_physical_table(
     tx: &mut sqlx::Transaction<'static, sqlx::Postgres>,
     env_id: Uuid,
@@ -577,7 +577,7 @@ async fn resolve_physical_table(
 
 // ── Data CRUD ───────────────────────────────────────────────────────────
 
-/// `POST /v1/data/query` — query rows with filters, sorts, pagination.
+/// `POST /v1/data/query` - query rows with filters, sorts, pagination.
 /// Soft-deleted rows (`deleted_at IS NOT NULL`) are excluded.
 #[utoipa::path(
     post,
@@ -633,13 +633,13 @@ pub async fn query(
 
     let limit = req.pagination.limit.unwrap_or(100).min(1000) as i64;
     // Keyset cursor (DB-3, db README §7): when set, it takes precedence over
-    // the offset window — stable under inserts between pages.
+    // the offset window - stable under inserts between pages.
     let after = req.pagination.after;
     let keyset = after.is_some();
 
     // WHERE: soft-delete exclusion + sanitized exact-match filters.
     // Filter grammar (db design): "update and delete accept the same filters
-    // object (an `id` filter is simply one predicate)" — system columns are
+    // object (an `id` filter is simply one predicate)" - system columns are
     // only reserved for SET/INSERT (managed by handlers), not for WHERE.
     let mut where_parts = vec!["deleted_at IS NULL".to_string()];
     let mut bindings: Vec<String> = Vec::new();
@@ -653,7 +653,7 @@ pub async fn query(
                 ));
             }
             let param = format!("${}", bindings.len() + 1);
-            // Cast the bound text param to the column's type — system UUID
+            // Cast the bound text param to the column's type - system UUID
             // columns (`id`) reject a bare text comparison, and typed columns
             // keep their declared type (design "Filter grammar": exact-match
             // predicates against the physical column).
@@ -684,7 +684,7 @@ pub async fn query(
         }
         order_by = format!(" ORDER BY {}", parts.join(", "));
     }
-    // Keyset mode (DB-3): the cursor is the last-seen row id — pin the
+    // Keyset mode (DB-3): the cursor is the last-seen row id - pin the
     // order to (requested sort, id) so the scan is deterministic and the
     // `id > $after` predicate aligns with it.
     let mut cursor_where = String::new();
@@ -731,7 +731,7 @@ pub async fn query(
     }
     // Bind exactly what the chosen SQL form declares: keyset pins `LIMIT $n`
     // (after the filter binds + the `id > ${n+1}` cursor), the offset window
-    // has `LIMIT $n OFFSET ${n+1}` — one page parameter each. A mismatch
+    // has `LIMIT $n OFFSET ${n+1}` - one page parameter each. A mismatch
     // aborts the statement ("bind message supplies N parameters, but
     // prepared statement requires M").
     q = q.bind(limit);
@@ -751,7 +751,7 @@ pub async fn query(
         .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
 
     let json_rows: Vec<serde_json::Value> = rows.into_iter().map(row_to_json).collect();
-    // next_cursor (DB-3): the last row's id when the page is full — null
+    // next_cursor (DB-3): the last row's id when the page is full - null
     // when the page is short (end of the stream).
     let next_cursor = if json_rows.len() as i64 == limit {
         json_rows.last().and_then(|r| {
@@ -778,7 +778,7 @@ pub struct InsertRequest {
     pub rows: Vec<serde_json::Value>,
 }
 
-/// `POST /v1/data/insert` — insert rows with mandatory system columns.
+/// `POST /v1/data/insert` - insert rows with mandatory system columns.
 ///
 /// Each row is split per design : `env_id` system column, the full JSON
 /// body into `data`, and any keys matching a declared typed column into that
@@ -840,7 +840,7 @@ pub async fn insert(
 
     let table_name = resolve_physical_table(&mut tx, env_id, &req.table).await?;
 
-    // Declared typed columns are read from the physical table itself —
+    // Declared typed columns are read from the physical table itself -
     // a single round-trip, always in sync with the schema.
     let typed = physical_columns(&mut tx, &table_name).await?;
 
@@ -886,7 +886,7 @@ pub async fn insert(
         inserted_ids.push(serde_json::json!(r.0));
     }
     // Row-level audit (db README §7, DB-4): one journal row per mutation
-    // carrying the affected row ids in `details` — the shell's journal
+    // carrying the affected row ids in `details` - the shell's journal
     // pusher (step 8c) forwards it to Sys so admin UIs can show exactly
     // which rows a data mutation touched.
     write_data_audit(
@@ -906,7 +906,7 @@ pub async fn insert(
 }
 
 /// DB-4 (db README §7): write a data-mutation audit journal row with the
-/// affected row ids in `details`. Same transaction as the mutation —
+/// affected row ids in `details`. Same transaction as the mutation -
 /// exactly-once with the domain change (the journal pusher retries until
 /// Sys accepts the push).
 async fn write_data_audit(
@@ -962,7 +962,7 @@ pub async fn health() -> Json<serde_json::Value> {
 
 // ── Table Alter (Stories) ───────────────────────────────────────────
 
-/// `POST /v1/tables/{id}/alter` — safe schema alteration (ADD COLUMN only).
+/// `POST /v1/tables/{id}/alter` - safe schema alteration (ADD COLUMN only).
 /// Env-scoped; audited + event emitted in the same transaction.
 #[derive(Debug, Deserialize, ToSchema)]
 /// Request body for altertable.
@@ -1095,7 +1095,7 @@ pub async fn alter_table(
 
 // ── Data Update (Stories) ──────────────────────────────────────────
 
-/// `POST /v1/data/update` — update rows by filter with resource version check.
+/// `POST /v1/data/update` - update rows by filter with resource version check.
 #[derive(Debug, Deserialize, ToSchema)]
 /// Request body for update.
 pub struct UpdateRequest {
@@ -1171,7 +1171,7 @@ pub async fn update(
 
     let table_name = resolve_physical_table(&mut tx, env_id, &req.table).await?;
 
-    // SET clause — values are bound parameters; only names are interpolated.
+    // SET clause - values are bound parameters; only names are interpolated.
     let mut set_parts = Vec::new();
     let mut bindings: Vec<String> = Vec::new();
     for (key, value) in set_obj {
@@ -1202,7 +1202,7 @@ pub async fn update(
     let mut where_parts = vec!["deleted_at IS NULL".to_string()];
     for (col, value) in filter_obj {
         let col_name = sanitize_identifier(col);
-        // Filter grammar: an `id` filter is one predicate (db design) —
+        // Filter grammar: an `id` filter is one predicate (db design) -
         // reserved columns are rejected for SET only.
         if col_name.is_empty() {
             return Err((
@@ -1274,7 +1274,7 @@ pub async fn update(
 
 // ── Data Delete (Stories) ───────────────────────────────────────────
 
-/// `POST /v1/data/delete` — soft-delete rows by filter (`deleted_at = now`).
+/// `POST /v1/data/delete` - soft-delete rows by filter (`deleted_at = now`).
 /// No hard-delete fallback: physical removal happens only via the controlled
 /// drop flow.
 #[derive(Debug, Deserialize, ToSchema)]
@@ -1354,7 +1354,7 @@ pub async fn delete(
     let mut bindings: Vec<String> = Vec::new();
     for (col, value) in filter_obj {
         let col_name = sanitize_identifier(col);
-        // Filter grammar: an `id` filter is one predicate (db design) —
+        // Filter grammar: an `id` filter is one predicate (db design) -
         // reserved columns are rejected for SET/INSERT only.
         if col_name.is_empty() {
             return Err((
@@ -1414,9 +1414,9 @@ pub async fn delete(
 
 // ── Helpers ─────────────────────────────────────────────────────────────
 
-/// Sanitize an identifier for use in SQL — only ASCII alphanumeric + underscore.
+/// Sanitize an identifier for use in SQL - only ASCII alphanumeric + underscore.
 /// Extract a filter/set value's scalar text from a JSON value. A JSON
-/// string `"abc"` binds as `abc` (not `"abc"` — the quotes are JSON syntax,
+/// string `"abc"` binds as `abc` (not `"abc"` - the quotes are JSON syntax,
 /// never data); numbers and booleans bind as their literal text; objects /
 /// arrays / nulls are rejected (exact-match predicates are scalar-only).
 /// Handle JSON scalar text.
@@ -1486,7 +1486,7 @@ async fn physical_columns(
 }
 
 /// Convert a sqlx Row to JSON: system columns typed directly, `data` payload
-/// flattened (typed columns take precedence — design row shape).
+/// flattened (typed columns take precedence - design row shape).
 fn row_to_json(row: sqlx::postgres::PgRow) -> serde_json::Value {
     let mut obj = serde_json::Map::new();
     for col in row.columns() {
@@ -1563,7 +1563,7 @@ async fn write_ddl_audit(
 
 // ── Table lifecycle: archive + drop (Stories) ─────────────
 
-/// `POST /v1/tables/{id}/archive` — mark a table as archived (Stories).
+/// `POST /v1/tables/{id}/archive` - mark a table as archived (Stories).
 /// Env-scoped; registry update, audit row, and event commit together.
 #[utoipa::path(
     post,
@@ -1660,9 +1660,9 @@ pub async fn archive_table(
     })))
 }
 
-/// `POST /v1/tables/{id}/drop` — pending-delete then drop (Stories).
+/// `POST /v1/tables/{id}/drop` - pending-delete then drop (Stories).
 /// Env-scoped; registry status, physical DROP, audit row, and event commit
-/// together — a failed DROP rolls the registry status back.
+/// together - a failed DROP rolls the registry status back.
 #[utoipa::path(
     post,
     operation_id = "table.drop",
@@ -1776,7 +1776,7 @@ pub async fn drop_table(
 
 // ── Operational APIs: posture + audit (Stories) ─────────
 
-/// `GET /v1/posture` — RLS drift detection (Stories).
+/// `GET /v1/posture` - RLS drift detection (Stories).
 #[utoipa::path(
     get,
     operation_id = "posture.get",
@@ -1876,7 +1876,7 @@ pub async fn posture(
     })))
 }
 
-/// `GET /v1/audit` — DDL audit log (Stories).
+/// `GET /v1/audit` - DDL audit log (Stories).
 #[utoipa::path(
     get,
     operation_id = "audit.list",
@@ -1959,7 +1959,7 @@ pub async fn audit_log(
 }
 
 /// Append an event to the shared `inbox` table **inside the domain
-/// transaction** (inbox-first, design ). Failure aborts the transaction —
+/// transaction** (inbox-first, design ). Failure aborts the transaction -
 /// the event and the domain change commit together. The stream family
 /// comes from the service config (`DB_STREAM_FAMILY`, default `db`).
 async fn emit_event_tx(
@@ -1972,7 +1972,7 @@ async fn emit_event_tx(
     sentin8::bus::outbox::insert_outbox_row(&mut **tx, env_id, stream_family, event_type, payload)
         .await
         .map_err(|e| {
-            tracing::error!(error = %e, event_type = %event_type, "db: inbox event insert failed — rolling back domain change");
+            tracing::error!(error = %e, event_type = %event_type, "db: inbox event insert failed - rolling back domain change");
             (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 format!("event emit failed: {e}"),

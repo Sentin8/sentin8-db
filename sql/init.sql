@@ -3,12 +3,12 @@
 -- SPDX-FileCopyrightText: Copyright Contributors to the Sentin8:DB
 -- SPDX-License-Identifier: Apache-2.0
 
--- Sentin8:DB — table registry and DDL audit log.
+-- Sentin8:DB - table registry and DDL audit log.
 -- The table registry stores metadata about all Sentin8:DB-managed tenant tables.
 -- The DDL audit log (Story 1.3.18) records every DDL operation on tenant
 -- tables for full auditability.
 
--- Sentin8:DB table registry — stores metadata about all Sentin8:DB-managed tenant tables.
+-- Sentin8:DB table registry - stores metadata about all Sentin8:DB-managed tenant tables.
 CREATE SCHEMA IF NOT EXISTS db;
 CREATE TABLE IF NOT EXISTS db.table_registry (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -59,7 +59,7 @@ CREATE POLICY db_table_registry_delete_policy ON db.table_registry
         AND env_id = sentin8_current_env_id()
     );
 
--- Story 1.3.18 — Sentin8:DB DDL audit log.
+-- Story 1.3.18 - Sentin8:DB DDL audit log.
 -- Records all DDL operations (create, alter, archive, drop) for auditability.
 CREATE TABLE IF NOT EXISTS db.ddl_audit (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -99,13 +99,13 @@ CREATE POLICY db_ddl_audit_insert_policy ON db.ddl_audit
 
 -- ── Grants ──
 
--- sentin8_db_service: DML on all db tables + CREATE on the schema —
+-- sentin8_db_service: DML on all db tables + CREATE on the schema -
 -- tenant-table DDL (`CREATE TABLE sentin8_db_*`, `ALTER TABLE`, `CREATE
 -- POLICY`) runs under the service's own per-service role (DBX §6.6:
 -- "through its own per-service role + declared grants in that database").
 -- The physical tables live in THIS schema; the CREATE privilege is the
 -- declared grant that makes the data-API's dynamic DDL work (design
--- "Table placement"). No BYPASSRLS — every table gets RLS immediately.
+-- "Table placement"). No BYPASSRLS - every table gets RLS immediately.
 GRANT CREATE ON SCHEMA db TO sentin8_db_service;
 GRANT SELECT, INSERT, UPDATE, DELETE ON
     db.table_registry, db.ddl_audit
@@ -189,7 +189,7 @@ CREATE POLICY audit_journal_dml ON db.audit_journal
     WITH CHECK (sentin8_context_initialized() AND env_id = sentin8_current_env_id());
 
 
--- ── Schema grants (service-owned — the 2026-10-03 ownership pass) ─────
+-- ── Schema grants (service-owned - the 2026-10-03 ownership pass) ─────
 -- This service's own schema: USAGE for its role (platform.sql no longer
 -- seeds per-service USAGE; the service declares it here).
 GRANT USAGE ON SCHEMA db TO sentin8_db_service;
