@@ -40,7 +40,7 @@ const ADMIN_SCOPES: &[&str] = &[
         ("target_env_id" = String, Query, description = "Target env (RLS context)")
     ),
     responses(
-        (status = 200, description = "RFW page definition (rendered by Sentin8:Dash)", body = serde_json::Value),
+        (status = 200, description = "RFW page definition (rendered by Sentin8:Dash)", body = sentin8::rfw::AdminUiResponse),
         (status = 403, description = "Caller lacks a db read/admin scope"),
         (status = 404, description = "Unknown page"),
     ),
@@ -51,7 +51,7 @@ pub async fn get_admin_ui(
     State(state): State<AppState>,
     headers: HeaderMap,
     Path(page): Path<String>,
-) -> Result<Json<serde_json::Value>, (axum::http::StatusCode, String)> {
+) -> Result<Json<AdminUiResponse>, (axum::http::StatusCode, String)> {
     let a = sentin8::auth::client::verify_bearer_token(&state.config.auth_client, &headers).await?;
     a.require_any_scope(ADMIN_SCOPES)?;
     let def = match page.as_str() {
@@ -170,9 +170,7 @@ pub async fn get_admin_ui(
             ))
         }
     };
-    Ok(Json(
-        serde_json::to_value(AdminUiResponse::page(def)).unwrap(),
-    ))
+    Ok(Json(AdminUiResponse::page(def)))
 }
 
 /// `GET /v1/admin/{resource}` - returns a JSON array of admin data rows.
@@ -188,7 +186,7 @@ pub async fn get_admin_ui(
         ("target_env_id" = String, Query, description = "Target env (RLS context)")
     ),
     responses(
-        (status = 200, description = "The resource's rows for the RFW table", body = serde_json::Value),
+        (status = 200, description = "The resource's rows for the RFW table", body = sentin8::rfw::policy_pages::AdminDataRows),
         (status = 403, description = "Caller lacks a db read/admin scope"),
         (status = 404, description = "Unknown resource"),
     ),
@@ -212,7 +210,7 @@ pub async fn get_admin_data(
     path = "/v1/admin/tables",
     params(("target_env_id" = String, Query, description = "Target env (RLS context)")),
     responses(
-        (status = 200, description = "The tables rows for the RFW table", body = serde_json::Value),
+        (status = 200, description = "The tables rows for the RFW table", body = sentin8::rfw::policy_pages::AdminDataRows),
         (status = 403, description = "Caller lacks a db read/admin scope"),
     ),
     security(("sentin8:db:admin" = [])),
@@ -342,7 +340,7 @@ async fn admin_data(
     params(("target_env_id" = String, Query, description = "Target env (RLS context)")),
     request_body = crate::handlers::CreateTableRequest,
     responses(
-        (status = 200, description = "Table created", body = serde_json::Value),
+        (status = 200, description = "Table created", body = sentin8::rfw::policy_pages::AdminRedirectAck),
         (status = 400, description = "Invalid create-table form"),
         (status = 403, description = "Caller lacks a db admin scope"),
     ),
@@ -370,7 +368,7 @@ pub async fn admin_create_table(
         ("target_env_id" = String, Query, description = "Target env (RLS context)")
     ),
     responses(
-        (status = 200, description = "Table archived", body = serde_json::Value),
+        (status = 200, description = "Table archived", body = sentin8::rfw::policy_pages::AdminRedirectAck),
         (status = 403, description = "Caller lacks a db admin scope"),
         (status = 404, description = "Unknown table"),
     ),
@@ -398,7 +396,7 @@ pub async fn admin_archive_table(
         ("target_env_id" = String, Query, description = "Target env (RLS context)")
     ),
     responses(
-        (status = 200, description = "Table dropped", body = serde_json::Value),
+        (status = 200, description = "Table dropped", body = sentin8::rfw::policy_pages::AdminRedirectAck),
         (status = 403, description = "Caller lacks a db admin scope"),
         (status = 404, description = "Unknown table"),
     ),

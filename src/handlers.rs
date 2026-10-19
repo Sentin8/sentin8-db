@@ -14,6 +14,7 @@
 //! execute the statement on the same transaction → commit. RLS context is
 //! always stamped from the verified token claims.
 
+use sentin8::middleware::health::LiveHealth;
 use std::sync::Arc;
 
 use axum::{
@@ -947,17 +948,19 @@ async fn write_data_audit(
     get,
     path = "/v1/health",
     responses(
-        (status = 200, description = "Liveness (version, build, active connections)", body = serde_json::Value),
+        (status = 200, description = "Liveness (version, build, active connections)", body = sentin8::middleware::health::LiveHealth),
     ),
     security(),
     tag = "meta",
 )]
-pub async fn health() -> Json<serde_json::Value> {
-    let mut payload = serde_json::json!({"status": "ok", "version": sentin8::build_info::id(), "build": sentin8::build_info::build_hash()});
-    if let Some(n) = sentin8::middleware::traffic_counter::process_active_connections() {
-        payload["active_connections"] = serde_json::json!(n);
-    }
-    Json(payload)
+pub async fn health() -> Json<LiveHealth> {
+    Json(LiveHealth {
+        status: "ok".to_string(),
+        service: None,
+        version: Some(sentin8::build_info::id()),
+        build: Some(sentin8::build_info::build_hash().to_string()),
+        active_connections: sentin8::middleware::traffic_counter::process_active_connections().map(|n| n as i64),
+    })
 }
 
 // ── Table Alter (Stories) ───────────────────────────────────────────
