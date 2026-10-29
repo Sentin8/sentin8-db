@@ -48,7 +48,7 @@ pub struct AppState {
     pub config: Arc<Db8Config>,
     /// The pool.
     pub pool: sqlx::PgPool,
-    /// Shield engine ( - ): additional gate after scope.
+    /// Shield engine : additional gate after scope.
     /// The policy.
     pub policy: Arc<crate::policy::Engine>,
     /// Shared Sentin8:Policy admin surface ( - one
