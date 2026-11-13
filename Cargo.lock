@@ -4098,7 +4098,7 @@ dependencies = [
 
 [[package]]
 name = "sentin8-db"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "anyhow",
  "axum",
@@ -4122,7 +4122,7 @@ dependencies = [
 
 [[package]]
 name = "sentin8-db-client"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "reqwest 0.12.28",
  "sentin8-db-contracts",
@@ -4138,7 +4138,7 @@ dependencies = [
 
 [[package]]
 name = "sentin8-db-contracts"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "chrono",
  "serde",
@@ -4149,7 +4149,7 @@ dependencies = [
 
 [[package]]
 name = "sentin8-db-sdk"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "sentin8-db-client",
  "sentin8-db-contracts",
