@@ -138,6 +138,7 @@ pub fn print(section: Option<String>) -> anyhow::Result<()> {
         service_type: "sentin8:db",
         subdomain: "db",
         health_path: "/v1/health",
+        exposure: "",
         admin_scopes: &[
             // Granular vocabulary: handlers gate
             // table DDL on `sentin8:db:table:admin`, data reads/writes on
