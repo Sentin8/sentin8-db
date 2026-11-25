@@ -8,7 +8,8 @@
       "telemetry_property": {
         "slug": "db",
         "name": "Sentin8:DB Platform Telemetry"
-      }
+      },
+      "exposure": "internal"
     }
   ]
 }
